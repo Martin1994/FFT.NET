@@ -5,9 +5,27 @@ using Xunit;
 
 namespace MartinCl2.Numerics
 {
-    public class FFTTest
+    public class NormalFFTTest : FFTTest<FFTCalculator>
+    {
+        protected override FFTCalculator CreateCalculator(long size)
+        {
+            return new FFTCalculator(size);
+        }
+    }
+
+    public class ParallelFFTTest : FFTTest<ParallelFFTCalculator>
+    {
+        protected override ParallelFFTCalculator CreateCalculator(long size)
+        {
+            return new ParallelFFTCalculator(size);
+        }
+    }
+
+    public abstract class FFTTest<T> where T : AbstractFFTCalculator
     {
         private static double PRECISION = 1e-7;
+
+        protected abstract T CreateCalculator(long size);
 
         private class ComplexComparer : IEqualityComparer<Complex>
         {
@@ -70,7 +88,7 @@ namespace MartinCl2.Numerics
             signal[1] = new Complex(-2.2, -1.8);
             signal[2] = new Complex(3.1, -2.5);
             signal[3] = new Complex(3.1, 0.7);
-
+ 
             Complex[] expected = new Complex[4];
             expected[0] = new Complex(4.3, -6.3);
             expected[1] = new Complex(-5.3, 5.1);
