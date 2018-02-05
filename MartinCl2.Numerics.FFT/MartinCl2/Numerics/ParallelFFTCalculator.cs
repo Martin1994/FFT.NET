@@ -10,7 +10,7 @@ namespace MartinCl2.Numerics
 {
     public sealed class ParallelFFTCalculator : AbstractFFTCalculator
     {
-        protected readonly Complex[] temp;
+        private readonly Complex[] temp;
         public ParallelFFTCalculator(long size) : base(size)
         {
             temp = new Complex[size];
@@ -38,8 +38,9 @@ namespace MartinCl2.Numerics
 
             // Assign the initial layer.
             from.CopyTo(lowerLayer, 0);
-
+            
             // Calculate the remaining layers.
+            // i.e. calculating the ith layer based on the (i + 1)th layer.
             for (int i = 1; i <= depth; i++)
             {
                 long p = 0;

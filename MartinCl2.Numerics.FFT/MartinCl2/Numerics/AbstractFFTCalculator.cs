@@ -8,8 +8,8 @@ namespace MartinCl2.Numerics
     {
         protected readonly long size;
         protected readonly int depth;
-        protected readonly Complex[] coefficientDFT;
-        protected readonly Complex[] coefficientIDFT;
+        private readonly Complex[] coefficientDFT;
+        private readonly Complex[] coefficientIDFT;
         
         public AbstractFFTCalculator(long size)
         {
@@ -57,7 +57,7 @@ namespace MartinCl2.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void FFTWorker(Complex[] upperLayer, Complex[] lowerLayer, Complex[] coefficient, int i, long jFrom, long jTo)
         {
-            // Copy fields to local variable
+            // Copy fields onto the stack
             int depth = this.depth;
 
             long kPeriod = 1L << i;
