@@ -21,6 +21,14 @@ namespace MartinCl2.Numerics
         }
     }
 
+    public class VectorizedFFTTest : FFTTest<VectorizedFFTCalculator>
+    {
+        protected override VectorizedFFTCalculator CreateCalculator(long size)
+        {
+            return new VectorizedFFTCalculator(size);
+        }
+    }
+
     public abstract class FFTTest<T> where T : AbstractFFTCalculator
     {
         private static double PRECISION = 1e-7;
