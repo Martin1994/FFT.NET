@@ -24,7 +24,7 @@ namespace Playground
             Console.WriteLine("Support Sse42: {0}", Sse42.IsSupported);
             Console.WriteLine("Support Fma: {0}", Fma.IsSupported);
 
-            int windowSize = 1024;
+            int windowSize = 4096;
 
             IFftCalculator[] calculatorsUsingArray = new IFftCalculator[]
             {
@@ -42,7 +42,9 @@ namespace Playground
             {
                 new SpanFftCalculator(windowSize),
                 new VectorTFftCalculator(windowSize),
+                new AlignedVectorTFftCalculator(windowSize),
                 new IntrinsicsFftCalculator(windowSize),
+                new AlignedIntrinsicsFftCalculator(windowSize),
             };
 
             foreach (var harness in calculatorsUsingSpan.Select(calculator => new FftBenchmarkHarness(calculator)))

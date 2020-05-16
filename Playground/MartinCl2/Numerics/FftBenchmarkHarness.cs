@@ -7,11 +7,12 @@ namespace MartinCl2.Numerics
     public class FftBenchmarkHarness
     {
         private readonly IFftCalculator calculator;
-        private readonly Complex[] testInput = new Complex[WINDOW_SIZE];
+        private readonly Complex[] testInput;
+        private int WindowSize { get => calculator.WindowSize; }
 
         private const int PREWARM_TIMES = 10;
-        private const int TEST_TIMES = 100000;
-        private const int WINDOW_SIZE = 4096;
+        private const int TEST_TIMES = 10000;
+        private const int BIT_ALIGNMENT = 512;
 
         public string Name
         {
@@ -21,9 +22,10 @@ namespace MartinCl2.Numerics
         public FftBenchmarkHarness(IFftCalculator calculator)
         {
             this.calculator = calculator;
+            testInput = new Complex[WindowSize];
 
             Random rnd = new Random();
-            for (int i = 0; i < WINDOW_SIZE; i++)
+            for (int i = 0; i < WindowSize; i++)
             {
                 testInput[i] = rnd.NextDouble();
             }
@@ -31,7 +33,7 @@ namespace MartinCl2.Numerics
 
         public TimeSpan BenchmarkUsingArray()
         {
-            Complex[] output = new Complex[4096];
+            Complex[] output = new Complex[WindowSize];
             for (int i = 0; i < PREWARM_TIMES; i++)
             {
                 calculator.DFT(testInput, output);
@@ -46,14 +48,12 @@ namespace MartinCl2.Numerics
             return TimeSpan.FromMilliseconds((double)sw.ElapsedMilliseconds / (double)TEST_TIMES);
         }
 
-        public TimeSpan BenchmarkUsingSpan()
+        public unsafe TimeSpan BenchmarkUsingSpan()
         {
-            Span<double> outputReal = stackalloc double[4096];
-            Span<double> outputImaginary = stackalloc double[4096];
-            ComplexSpan output = new ComplexSpan(outputReal, outputImaginary);
-            Span<double> inputReal = stackalloc double[4096];
-            Span<double> inputImaginary = stackalloc double[4096];
-            ComplexSpan input = new ComplexSpan(inputReal, inputImaginary);
+            double* outputMemory = stackalloc double[WindowSize * 2 + BIT_ALIGNMENT / sizeof(double)];
+            ComplexSpan output = new ComplexSpan(outputMemory, WindowSize, BIT_ALIGNMENT);
+            double* inputMemory = stackalloc double[WindowSize * 2 + BIT_ALIGNMENT / sizeof(double)];
+            ComplexSpan input = new ComplexSpan(inputMemory, WindowSize, BIT_ALIGNMENT);
             testInput.CopyTo(input);
 
             for (int i = 0; i < PREWARM_TIMES; i++)

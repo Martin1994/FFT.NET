@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace MartinCl2.Numerics
 {
-    public class VectorTFftCalculator : IFftCalculator
+    public class FftCalculator
     {
         private readonly int windowSize;
         private readonly int depth;
@@ -13,7 +13,7 @@ namespace MartinCl2.Numerics
         private readonly double[] idftCoefficientReal;
         private readonly double[] idftCoefficientImaginary;
 
-        public VectorTFftCalculator(int windowSize)
+        public FftCalculator(int windowSize)
         {
             if (windowSize <= 0)
             {
@@ -49,59 +49,15 @@ namespace MartinCl2.Numerics
 
         public int WindowSize { get => windowSize; }
 
-        public void DFT(Complex[] signal, Complex[] spectrum)
+        public void DFT(ReadOnlySpan<double> signalReal, ReadOnlySpan<double> signalImaginary, Span<double> spectrumReal, Span<double> spectrumImaginary)
         {
-            Span<double> signalReal = stackalloc double[windowSize];
-            Span<double> signalImaginary = stackalloc double[windowSize];
-            Span<double> spectrumReal = stackalloc double[windowSize];
-            Span<double> spectrumImaginary = stackalloc double[windowSize];
-
-            for (int i = 0; i < windowSize; i++)
-            {
-                signalReal[i] = signal[i].Real;
-                signalImaginary[i] = signal[i].Imaginary;
-            }
-
-            DFT(new ComplexSpan(signalReal, signalImaginary), new ComplexSpan(spectrumReal, spectrumImaginary));
-
-            for (int i = 0; i < windowSize; i++)
-            {
-                spectrum[i] = new Complex(spectrumReal[i], spectrumImaginary[i]);
-            }
+            FFT(new ReadOnlyComplexSpan(signalReal, signalImaginary), new ComplexSpan(spectrumReal, spectrumImaginary), new ComplexSpan(dftCoefficientReal, dftCoefficientImaginary));
         }
 
-        public void IDFT(Complex[] spectrum, Complex[] signal)
+        public void IDFT(ReadOnlySpan<double> spectrumReal, ReadOnlySpan<double> spectrumImaginary, Span<double> signalReal, Span<double> signalImaginary)
         {
-            Span<double> signalReal = stackalloc double[windowSize];
-            Span<double> signalImaginary = stackalloc double[windowSize];
-            Span<double> spectrumReal = stackalloc double[windowSize];
-            Span<double> spectrumImaginary = stackalloc double[windowSize];
-
-            for (int i = 0; i < windowSize; i++)
-            {
-                spectrumReal[i] = spectrum[i].Real;
-                spectrumImaginary[i] = spectrum[i].Imaginary;
-            }
-
-            IDFT(new ComplexSpan(spectrumReal, spectrumImaginary), new ComplexSpan(signalReal, signalImaginary));
-
-            for (int i = 0; i < windowSize; i++)
-            {
-                signal[i] = new Complex(signalReal[i], signalImaginary[i]);
-            }
-        }
-
-        public void DFT(ReadOnlyComplexSpan signal, ComplexSpan spectrum)
-        {
-            FFT(signal, spectrum, new ComplexSpan(dftCoefficientReal, dftCoefficientImaginary));
-        }
-
-        public void IDFT(ReadOnlyComplexSpan spectrum, ComplexSpan signal)
-        {
-            FFT(spectrum, signal, new ComplexSpan(idftCoefficientReal, idftCoefficientImaginary));
+            FFT(new ReadOnlyComplexSpan(spectrumReal, spectrumImaginary), new ComplexSpan(signalReal, signalImaginary), new ComplexSpan(idftCoefficientReal, idftCoefficientImaginary));
             double coefficientAdjustment = 1D / windowSize;
-            Span<double> signalReal = signal.Real;
-            Span<double> signalImaginary = signal.Imaginary;
             for (int i = 0; i < windowSize; i++)
             {
                 signalReal[i] *= coefficientAdjustment;
