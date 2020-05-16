@@ -136,3 +136,47 @@ IntrinsicsFftCalculator: 00:00:00.0001139
 ```
 
 Note: `IntrinsicsFftCalculator` falled back to an SISD implementation
+
+## Platinum 8175M - 2.50GHz / 1C2T virtualized (EC2 t3.micro) - Amazon Linux
+```
+Number of cores: 2
+Accelerated vectors: True
+Size of vectors: 4
+Support Avx2: True
+Support Avx: True
+Support Sse: True
+Support Sse2: True
+Support Sse3: True
+Support Ssse3: True
+Support Sse41: True
+Support Sse42: True
+Support Fma: True
+FftCalculator: 00:00:00.0000442
+ParallelFftCalculator: 00:00:00.0001234
+SpanFftCalculator: 00:00:00.0000519
+VectorTFftCalculator: 00:00:00.0000391
+IntrinsicsFftCalculator: 00:00:00.0000346
+```
+
+## Graviton 2 - 2.50GHz / 1C1T virtualized (EC2 m6g.medium) - Amazon Linux
+```
+Number of cores: 1
+Accelerated vectors: True
+Size of vectors: 2
+Support Avx2: False
+Support Avx: False
+Support Sse: False
+Support Sse2: False
+Support Sse3: False
+Support Ssse3: False
+Support Sse41: False
+Support Sse42: False
+Support Fma: False
+FftCalculator: 00:00:00.0000491
+ParallelFftCalculator: 00:00:00.0000669
+SpanFftCalculator: 00:00:00.0000481
+VectorTFftCalculator: 00:00:00.0000456
+IntrinsicsFftCalculator: 00:00:00.0000490
+```
+
+Note: `IntrinsicsFftCalculator` falled back to an SISD implementation
